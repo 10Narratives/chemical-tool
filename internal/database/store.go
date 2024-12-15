@@ -109,3 +109,75 @@ func (store Store) GetElements(target models.Compound) ([]models.Element, error)
 	}
 	return gottenElements, nil
 }
+
+// GetCompound retrieves a chemical compound from the database using its formula.
+// It queries the database for a compound based on the provided formula and returns
+// the corresponding compound's details including its formula, name, and appearance.
+//
+// Arguments:
+//
+//	formula (string): The chemical formula of the compound to retrieve.
+//
+// Returns:
+//
+//	models.Compound: The compound with the requested formula, including its name and appearance.
+//	error: An error, if any, that occurred while querying the database or scanning the results.
+//
+// If no compound is found with the given formula, the function returns an empty compound and nil error.
+//
+// Example:
+//
+//	formula := "H2O"
+//	compound, err := store.GetCompound(formula)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Println(compound.Name, compound.Appearance)
+func (store Store) GetCompound(formula string) (models.Compound, error) {
+	row := store.DB.QueryRow("SELECT formula name appearance FROM compounds WHERE formula = ?", formula)
+
+	gottenCompound := models.Compound{}
+	err := row.Scan(&gottenCompound.Formula, &gottenCompound.Name, &gottenCompound.Appearance)
+	if errors.Is(err, sql.ErrNoRows) {
+		return models.Compound{}, nil
+	}
+	if err != nil {
+		return models.Compound{}, err
+	}
+
+	return gottenCompound, nil
+}
+
+// GetCompounds retrieves multiple compounds from the database based on a list of formulas.
+// It calls GetCompound for each formula in the provided list and collects the results.
+//
+// Arguments:
+//
+//	formulas ([]string): A slice of chemical formulas for which the compounds are to be retrieved.
+//
+// Returns:
+//
+//	[]models.Compound: A slice of compounds corresponding to the provided formulas.
+//	error: An error, if any, occurred during the database queries or while processing the results.
+//
+// Example:
+//
+//	formulas := []string{"H2O", "NaCl"}
+//	compounds, err := store.GetCompounds(formulas)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	for _, compound := range compounds {
+//	    fmt.Println(compound.Name, compound.Appearance)
+//	}
+func (store Store) GetCompounds(formulas []string) ([]models.Compound, error) {
+	var gottenCompound []models.Compound = make([]models.Compound, 0)
+	for _, formula := range formulas {
+		compound, err := store.GetCompound(formula)
+		if err != nil {
+			return nil, err
+		}
+		gottenCompound = append(gottenCompound, compound)
+	}
+	return gottenCompound, nil
+}
