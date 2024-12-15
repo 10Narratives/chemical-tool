@@ -56,7 +56,7 @@ func (service MolarMassService) GetResponse(requestedData string) (MolarMassResp
 		return response, nil
 	}
 
-	response = service.computeData(compound, elements)
+	response = service.ComputeData(compound, elements)
 
 	return response, nil
 }
@@ -74,7 +74,7 @@ func (service MolarMassService) GetResponse(requestedData string) (MolarMassResp
 // Returns:
 //   - MolarMassResponse: A response containing the general weight
 //     and detailed information about the elements in the compound.
-func (service MolarMassService) computeData(compound models.Compound, elements []models.Element) MolarMassResponse {
+func (service MolarMassService) ComputeData(compound models.Compound, elements []models.Element) MolarMassResponse {
 	var (
 		generalWeight float64                = 0.0
 		elementsInfo  []MolarMassElementInfo = make([]MolarMassElementInfo, len(elements))
