@@ -3,8 +3,6 @@ package services
 import (
 	"chemical-tool/internal/database"
 	"chemical-tool/internal/models"
-	"database/sql"
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -38,13 +36,6 @@ type ChemicalService struct {
 //   - error: An error value that will be non-nil if any issues were
 //     encountered during parsing, including unknown elements or
 //     conversion errors.
-//
-// Example:
-//
-//	compound, err := service.ParseCompound("C6H12O6")
-//	if err != nil {
-//	    // handle error
-//	}
 func (service ChemicalService) ParseCompound(formula string) (models.Compound, error) {
 	var err error
 	elementCounts := make(map[string]int)
@@ -91,14 +82,6 @@ func (service ChemicalService) ParseCompound(formula string) (models.Compound, e
 			if err != nil {
 				return models.Compound{}, err
 			}
-		}
-		_, err := service.store.GetElement(element)
-		if err == sql.ErrNoRows {
-			err = errors.New("Gotten unknown element in compound")
-			return models.Compound{}, err
-		}
-		if err != nil {
-			return models.Compound{}, nil
 		}
 		elementCounts[element] += count
 	}
