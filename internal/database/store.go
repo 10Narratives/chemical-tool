@@ -35,7 +35,7 @@ func (store Store) GetElement(symbol string) (models.Element, error) {
 	gottenElement := models.Element{}
 	err := row.Scan(&gottenElement.Symbol, &gottenElement.AtomicWeight)
 	if errors.Is(err, sql.ErrNoRows) {
-		return models.Element{}, nil
+		return models.Element{}, sql.ErrNoRows
 	}
 	if err != nil {
 		return models.Element{}, err
